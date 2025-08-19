@@ -11,9 +11,11 @@ client = genai.Client(api_key=api_key)
 
 
 def main():
-    if len(sys.argv) < 2 or len(sys.argv) > 2:
-        print("Only argument must be the prompt")
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print(f'Usage: {sys.argv[0]} "prompt" [--verbose]')
         sys.exit(1)
+
+    verbose = len(sys.argv) == 3 and sys.argv[2] == "--verbose"
 
     user_prompt = sys.argv[1]
     messages = [
@@ -24,8 +26,10 @@ def main():
         contents=messages,
     )
     print(resp.text)
-    print(f"Prompt tokens: {resp.usage_metadata.prompt_token_count}")
-    print(f"Response tokens: {resp.usage_metadata.candidates_token_count}")
+    if (verbose):
+        print(f"User prompt: {user_prompt}")
+        print(f"Prompt tokens: {resp.usage_metadata.prompt_token_count}")
+        print(f"Response tokens: {resp.usage_metadata.candidates_token_count}")
 
 
 if __name__ == "__main__":
