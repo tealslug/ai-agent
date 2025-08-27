@@ -11,3 +11,6 @@ wheels/
 
 # api key
 .env
+
+# files created by tests
+ignore-this.txt
