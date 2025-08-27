@@ -16,6 +16,7 @@ def get_files_info(working_directory, directory="."):
 
     return "\n".join(items)
 
+
 def get_file_content(working_directory, file_path):
     dir = os.path.join(working_directory, file_path)
     curdir = os.path.abspath(os.getcwd()) + f"/{working_directory}"
@@ -33,3 +34,25 @@ def get_file_content(working_directory, file_path):
         file_content_string += f'[...File "{file_path}" truncated at 10000 characters]'
 
     return file_content_string
+
+
+def write_file(working_directory, file_path, content):
+    dir = os.path.join(working_directory, file_path)
+    curdir = os.path.abspath(os.getcwd()) + f"/{working_directory}"
+    abspath = os.path.abspath(dir)
+    if not abspath.startswith(curdir):
+        return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'
+
+    if not os.path.exists(abspath):
+        try:
+            os.makedirs(os.path.dirname(abspath), exist_ok=True)
+        except Exception as e:
+            return f"Error: {e}"
+
+    with open(abspath, "w") as f:
+        try:
+            f.write(content)
+        except Exception as e:
+            return f"Error: {e}"
+
+    return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'

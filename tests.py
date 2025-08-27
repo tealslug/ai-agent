@@ -1,7 +1,24 @@
 # tests.py
 
 import unittest
-from functions.get_files_info import get_files_info, get_file_content
+from functions.get_files_info import get_files_info, get_file_content, write_file
+
+
+class TestWriteFile(unittest.TestCase):
+    def test_outside_working_dir(self):
+        result = write_file("calculator", "/tmp/temp.txt", "this should not be allowed")
+        print(f"\n{result}")
+        self.assertEqual(result, 'Error: Cannot write to "/tmp/temp.txt" as it is outside the permitted working directory')
+
+    def test_write_file_in_workingdir(self):
+        result = write_file("calculator", "ignore-this.txt", "wait, this isn't lorem ipsum")
+        print(f"\n{result}")
+        self.assertEqual(result, f'Successfully wrote to "ignore-this.txt" (28 characters written)')
+
+    def test_write_file_in_subdir(self):
+        result = write_file("calculator", "pkg/ignore-this.txt", "lorem ipsum dolor sit amet")
+        print(f"\n{result}")
+        self.assertEqual(result, f'Successfully wrote to "pkg/ignore-this.txt" (26 characters written)')
 
 
 class TestGetFileContent(unittest.TestCase):
@@ -71,4 +88,4 @@ class TestGetFilesInfo(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main(defaultTest="TestGetFileContent")
+    unittest.main(defaultTest="TestWriteFile")
