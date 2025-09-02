@@ -59,8 +59,10 @@ class TestGetFilesInfo(unittest.TestCase):
         result = get_files_info("calculator", ".")
         print(f"\n{result}")
         self.assertEqual(result,
+            " - ignore-this.txt: file_size=28 bytes, is_dir=False\n" +
+            " - lorem.txt: file_size=20063 bytes, is_dir=False\n" +
             " - main.py: file_size=576 bytes, is_dir=False\n" +
-            " - pkg: file_size=160 bytes, is_dir=True\n" +
+            " - pkg: file_size=192 bytes, is_dir=True\n" +
             " - tests.py: file_size=1343 bytes, is_dir=False")
 
     def test_calculator_pkg_files(self):
@@ -69,6 +71,7 @@ class TestGetFilesInfo(unittest.TestCase):
         self.assertEqual(result,
             " - __pycache__: file_size=128 bytes, is_dir=True\n" +
             " - calculator.py: file_size=1738 bytes, is_dir=False\n" +
+            " - ignore-this.txt: file_size=26 bytes, is_dir=False\n" +
             " - render.py: file_size=767 bytes, is_dir=False")
 
     def test_calculator_bin(self):
@@ -88,4 +91,4 @@ class TestGetFilesInfo(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main(defaultTest="TestWriteFile")
+    unittest.main(defaultTest="TestGetFilesInfo")

@@ -1,9 +1,14 @@
 import os
 
-def get_files_info(working_directory, directory="."):
+def generate_paths(working_directory, directory):
     dir = os.path.join(working_directory, directory)
     curdir = os.path.abspath(os.getcwd()) + f"/{working_directory}"
     abspath = os.path.abspath(dir)
+    return (curdir, abspath)
+
+def get_files_info(working_directory, directory="."):
+    (curdir, abspath) = generate_paths(working_directory, directory)
+
     if not abspath.startswith(curdir):
         return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
     if not os.path.isdir(abspath):
@@ -18,9 +23,8 @@ def get_files_info(working_directory, directory="."):
 
 
 def get_file_content(working_directory, file_path):
-    dir = os.path.join(working_directory, file_path)
-    curdir = os.path.abspath(os.getcwd()) + f"/{working_directory}"
-    abspath = os.path.abspath(dir)
+    (curdir, abspath) = generate_paths(working_directory, file_path)
+
     if not abspath.startswith(curdir):
         return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
     if not os.path.isfile(abspath):
@@ -37,9 +41,8 @@ def get_file_content(working_directory, file_path):
 
 
 def write_file(working_directory, file_path, content):
-    dir = os.path.join(working_directory, file_path)
-    curdir = os.path.abspath(os.getcwd()) + f"/{working_directory}"
-    abspath = os.path.abspath(dir)
+    (curdir, abspath) = generate_paths(working_directory, file_path)
+
     if not abspath.startswith(curdir):
         return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'
 
@@ -56,3 +59,7 @@ def write_file(working_directory, file_path, content):
             return f"Error: {e}"
 
     return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
+
+def run_python_file(working_directory, file_path, args=[]):
+    pass
+
