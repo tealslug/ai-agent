@@ -1,7 +1,7 @@
 # tests.py
 
 import unittest
-from functions.get_files_info import get_files_info, get_file_content, write_file
+from functions.get_files_info import get_files_info, get_file_content, write_file, run_python_file
 
 
 class TestWriteFile(unittest.TestCase):
@@ -87,8 +87,42 @@ class TestGetFilesInfo(unittest.TestCase):
     def test_not_a_directory(self):
         result = get_files_info("calculator", "doesnt_exist")
         print(f"\n{result}")
-        self.assertEqual(result, ''f'Error: "doesnt_exist" is not a directory')
+        self.assertEqual(result, f'Error: "doesnt_exist" is not a directory')
+
+
+class TestRunPythonFile(unittest.TestCase):
+    def test_outside_working_dir(self):
+        result = run_python_file("calculator", "../main.py")
+        print(f"\n{result}")
+        self.assertEqual(result, f'Error: Cannot execute "../main.py" as it is outside the permitted working directory')
+
+    def test_file_doesnt_exist(self):
+        result = run_python_file("calculator", "nonexistent.py")
+        print(f"\n{result}")
+        self.assertEqual(result, f'Error: File "nonexistent.py" not found.')
+
+    def test_file_isnt_a_file(self):
+        result = run_python_file("calculator", "pkg")
+        print(f"\n{result}")
+        self.assertEqual(result, f'Error: "pkg" is not a Python file.')
+
+    def test_file_isnt_a_python_file(self):
+        result = run_python_file("calculator", "lorem.txt")
+        print(f"\n{result}")
+        self.assertEqual(result, f'Error: "lorem.txt" is not a Python file.')
+
+    def test_calculator_main_without_args(self):
+        result = run_python_file("calculator", "main.py")
+        print(f"\n{result}")
+        self.assertTrue(result.startswith("STDOUT:"))
+        self.assertTrue("Usage" in result)
+
+    def test_calculator_main_with_args(self):
+        result = run_python_file("calculator", "main.py", ["3 + 5"])
+        print(f"\n{result}")
+        self.assertTrue(result.startswith("STDOUT:"))
+        self.assertTrue("8" in result)
 
 
 if __name__ == "__main__":
-    unittest.main(defaultTest="TestGetFilesInfo")
+    unittest.main(defaultTest="TestRunPythonFile")
