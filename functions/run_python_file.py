@@ -1,7 +1,40 @@
 import os
 import subprocess
-from functions.util import generate_paths
 from google.genai import types
+
+
+def run_python_file(working_directory, file_path, args=[]):
+    abs_working_dir = os.path.abspath(working_directory)
+    abs_file_path = os.path.abspath(os.path.join(working_directory, file_path))
+    if not abs_file_path.startswith(abs_working_dir):
+        return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'
+    if not os.path.exists(abs_file_path):
+        return f'Error: File "{file_path}" not found.'
+    if not file_path.endswith(".py"):
+        return f'Error: "{file_path}" is not a Python file.'
+    try:
+        commands = ["python", abs_file_path]
+        if args:
+            commands.extend(args)
+        result = subprocess.run(
+            commands,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=abs_working_dir,
+        )
+        output = []
+        if result.stdout:
+            output.append(f"STDOUT:\n{result.stdout}")
+        if result.stderr:
+            output.append(f"STDERR:\n{result.stderr}")
+
+        if result.returncode != 0:
+            output.append(f"Process exited with code {result.returncode}")
+
+        return "\n".join(output) if output else "No output produced."
+    except Exception as e:
+        return f"Error: executing Python file: {e}"
 
 
 schema_run_python_file = types.FunctionDeclaration(
@@ -28,27 +61,4 @@ schema_run_python_file = types.FunctionDeclaration(
 
 
 
-def run_python_file(working_directory, file_path, args=[]):
-    (curdir, abspath) = generate_paths(working_directory, file_path)
 
-    if not abspath.startswith(curdir):
-        return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'
-    if not os.path.exists(abspath):
-        return f'Error: File "{file_path}" not found.'
-    if not os.path.isfile(abspath) or not abspath.endswith(".py"):
-        return f'Error: "{file_path}" is not a Python file.'
-
-    try:
-        res = subprocess.run(["python3", file_path] + args, cwd=curdir, timeout=30, capture_output=True, text=True)
-    except Exception as e:
-        return f"Error: executing Python file: {e}"
-
-    output = []
-    if res.stdout:
-        output.append(f'STDOUT:\n{res.stdout}')
-    if res.stderr:
-        output.append(f'STDERR:\n{res.stderr}')
-    if res.returncode != 0:
-        output.append(f'Process exited with code {res.returncode}')
-
-    return "\n".join(output) if output else "No output produced."
